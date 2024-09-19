@@ -19,14 +19,8 @@ type ArticlesProps = {
 };
 
 const Articles: NextPage<ArticlesProps> = ({ articles }) => {
-  const [searchQuery, setSearchQuery] = useState<string>("");
-
-  // Filtered articles based on search query
-  const filteredArticles = articles.filter((article) =>
-    Object.values(article).some((value) =>
-      value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  );
+  const [searchQuery, setSearchQuery] = useState<string>(""); // Search input
+  const [filterColumn, setFilterColumn] = useState<string>(""); // Selected column to filter by
 
   const headers: { key: keyof ArticlesInterface; label: string }[] = [
     { key: "title", label: "Title" },
@@ -38,10 +32,20 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
     { key: "evidence", label: "Evidence" },
   ];
 
+  // Filter articles based on the selected column and search query
+  const filteredArticles = articles.filter((article) => {
+    if (!filterColumn) return true; // If no filter is selected, show all
+    const columnValue = article[filterColumn as keyof ArticlesInterface];
+    return columnValue
+      ?.toString()
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+  });
+
   return (
     <div className="container">
       <h1>Articles Index Page</h1>
-      <p>Page containing a table of articles:</p>
+      <p>Page containing a table of articles with search and filter options:</p>
 
       {/* Search input */}
       <input
@@ -58,12 +62,33 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
         }}
       />
 
+      {/* Filter by column */}
+      <div style={{ marginBottom: "20px" }}>
+        <label htmlFor="filter-column" style={{ marginRight: "10px" }}>
+          Filter by:
+        </label>
+        <select
+          id="filter-column"
+          value={filterColumn}
+          onChange={(e) => setFilterColumn(e.target.value)}
+          style={{ padding: "10px", fontSize: "16px" }}
+        >
+          <option value="">All Columns</option>
+          {headers.map((header) => (
+            <option key={header.key} value={header.key}>
+              {header.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Sortable table with filtered articles */}
       <SortableTable headers={headers} data={filteredArticles} />
     </div>
   );
 };
 
+// Static Props fetching
 export const getStaticProps: GetStaticProps<ArticlesProps> = async (_) => {
   // Map the data to ensure all articles have consistent property names
   const articles = data.map((article) => ({
