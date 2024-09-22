@@ -1,7 +1,11 @@
 import { GetStaticProps, NextPage } from "next";
 import { useState } from "react";
 import SortableTable from "../../components/table/SortableTable";
-import data from "../../utils/dummydata";
+//Commented to use articles from MongoDB instead
+//import data from "../../utils/dummydata";
+import React, { useState, useEffect } from 'react';
+import { client } from '../../utils/mongo'; // Assuming you exported client from mongo.js
+
 
 interface ArticlesInterface {
   id: string;
@@ -17,6 +21,32 @@ interface ArticlesInterface {
 type ArticlesProps = {
   articles: ArticlesInterface[];
 };
+
+//Fetch database JSON from MongoDB
+function DatabaseFetch() {
+  const [data, setData] = useState([]);
+    
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const db = client.db("BackendTesting");
+      const collection = db.collection("Books");
+      const result = await collection.find({}).toArray();
+      setData(result);
+    };
+
+    if (client.isConnected()) {
+      fetchData();
+    } else {
+      // Handle the case where the connection is not established yet
+      console.log("Connecting to MongoDB...");
+    }
+  }, [client]);
+
+  // ... rest of your component logic using the data state
+
+  return useEffect;
+}
 
 const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   const [searchQuery, setSearchQuery] = useState<string>(""); // Search input
@@ -90,9 +120,12 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
 
 // Static Props fetching
 export const getStaticProps: GetStaticProps<ArticlesProps> = async (_) => {
+  //Fetch MongoDB data
+  const data = DatabaseFetch();
+
   // Map the data to ensure all articles have consistent property names
-  const articles = data.map((article) => ({
-    id: article.id ?? article._id,
+  const articles = data.map((article : ArticlesInterface) => ({
+    id: article.id ?? article.id,
     title: article.title,
     authors: article.authors,
     source: article.source,
