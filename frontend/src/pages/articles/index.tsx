@@ -20,16 +20,25 @@ type ArticlesProps = {
 const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   const [searchQuery, setSearchQuery] = useState<string>(""); // Search input
   const [filterColumn, setFilterColumn] = useState<string>(""); // Selected column to filter by
+  const [ratings, setRatings] = useState<Record<string, number | string>>({}); // Track ratings
 
-  const headers: { key: keyof ArticlesInterface; label: string }[] = [
+  const headers: { key: keyof ArticlesInterface | 'rating'; label: string }[] = [
     { key: "title", label: "Title" },
     { key: "authors", label: "Authors" },
+    { key: "rating", label: "Rating" }, // New Rating column
     { key: "source", label: "Source" },
     { key: "pubyear", label: "Publication Year" },
     { key: "doi", label: "DOI" },
     { key: "claim", label: "Claim" },
     { key: "evidence", label: "Evidence" },
   ];
+
+  const handleRatingChange = (articleId: string, rating: string) => {
+    setRatings((prevRatings) => ({
+      ...prevRatings,
+      [articleId]: rating,
+    }));
+  };
 
   // Filter articles based on the selected column and search query
   const filteredArticles = articles.filter((article) => {
@@ -81,8 +90,25 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
         </select>
       </div>
 
-      {/* Sortable table with filtered articles */}
-      <SortableTable headers={headers} data={filteredArticles} />
+      {/* Sortable table with filtered articles and rating column */}
+      <SortableTable
+        headers={headers}
+        data={filteredArticles.map((article) => ({
+          ...article,
+          rating: (
+            <select
+              onChange={(e) => handleRatingChange(article.id, e.target.value)}
+              value={ratings[article.id] || ""}
+              style={{ padding: '5px' }}
+            >
+              <option value="">Rate</option>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <option key={star} value={star}>{star} ⭐</option>
+              ))}
+            </select>
+          )
+        }))}
+      />
     </div>
   );
 };
