@@ -1,7 +1,6 @@
-import { GetStaticProps, NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import { useState } from "react";
 import SortableTable from "../../components/table/SortableTable";
-import data from "../../utils/dummydata";
 
 interface ArticlesInterface {
   id: string;
@@ -114,23 +113,25 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   );
 };
 
-// Static Props fetching
-export const getStaticProps: GetStaticProps<ArticlesProps> = async (_) => {
-  // Map the data to ensure all articles have consistent property names
-  const articles = data.map((article) => ({
-    id: article.id ?? article._id,
-    title: article.title,
-    authors: article.authors,
-    source: article.source,
-    pubyear: article.pubyear,
-    doi: article.doi,
-    claim: article.claim,
-    evidence: article.evidence,
-  }));
+// Fetch data from the NestJS backend
+export const getServerSideProps = async () => {
+  const res = await fetch('http://localhost:3001/articles');
+  const articles = await res.json();
+
+  console.log("Fetched Articles:", articles); // Log fetched data
 
   return {
     props: {
-      articles,
+      articles: Array.isArray(articles) ? articles.map((article: any) => ({
+        id: article._id || null, 
+        title: article.title,
+        authors: article.authors,
+        source: article.source,
+        pubyear: article.pubyear,
+        doi: article.doi,
+        claim: article.claim,
+        evidence: article.evidence,
+      })) : [],
     },
   };
 };
