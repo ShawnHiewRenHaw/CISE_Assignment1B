@@ -88,14 +88,16 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
 };
 
 // Fetch data from the NestJS backend
-export const getServerSideProps: GetServerSideProps<ArticlesProps> = async (_) => {
-  const res = await fetch('http://localhost:3001/articles'); // NestJS API endpoint
+export const getServerSideProps = async () => {
+  const res = await fetch('http://localhost:3001/articles');
   const articles = await res.json();
+
+  console.log("Fetched Articles:", articles); // Log fetched data
 
   return {
     props: {
-      articles: articles.map((article: any) => ({
-        id: article._id, // Assuming _id is used in MongoDB
+      articles: Array.isArray(articles) ? articles.map((article: any) => ({
+        id: article._id || null, 
         title: article.title,
         authors: article.authors,
         source: article.source,
@@ -103,7 +105,7 @@ export const getServerSideProps: GetServerSideProps<ArticlesProps> = async (_) =
         doi: article.doi,
         claim: article.claim,
         evidence: article.evidence,
-      })),
+      })) : [],
     },
   };
 };
