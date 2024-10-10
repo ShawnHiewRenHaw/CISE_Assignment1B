@@ -3,9 +3,10 @@ import React from "react";
 interface SortableTableProps {
   headers: { key: string; label: string }[];
   data: any[];
+  rowKey: (row: any) => string; // Add a rowKey prop to specify unique key for each row
 }
 
-const SortableTable: React.FC<SortableTableProps> = ({ headers, data }) => (
+const SortableTable: React.FC<SortableTableProps> = ({ headers, data, rowKey }) => (
   <div style={{ overflowX: "auto" }}>
     <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
       <thead>
@@ -14,12 +15,12 @@ const SortableTable: React.FC<SortableTableProps> = ({ headers, data }) => (
             <th
               key={header.key}
               style={{
-                padding: "16px",  // Increase padding for bigger header rows
+                padding: "16px",
                 borderBottom: "2px solid #ddd",
                 backgroundColor: "#f9f9f9",
                 textAlign: "left",
-                width: getColumnWidth(header.key),  // Set specific column width
-                minWidth: "80px",  // Ensure a reasonable minimum width
+                width: getColumnWidth(header.key),
+                minWidth: "80px",
               }}
             >
               {header.label}
@@ -29,22 +30,22 @@ const SortableTable: React.FC<SortableTableProps> = ({ headers, data }) => (
       </thead>
       <tbody>
         {data.length > 0 ? (
-          data.map((row, i) => (
-            <tr key={i}>
+          data.map((row) => (
+            <tr key={rowKey(row)}> {/* Use rowKey to set unique key */}
               {headers.map((header) => (
                 <td
                   key={header.key}
                   style={{
-                    padding: "16px",  // Increase padding for bigger rows
+                    padding: "16px",
                     borderBottom: "1px solid #ddd",
                     textAlign: "left",
-                    whiteSpace: "normal",  // Allow text to wrap within the cells
+                    whiteSpace: "normal",
                     wordWrap: "break-word",
-                    maxWidth: "200px",  // Max width for cells (especially for title)
+                    maxWidth: "200px",
                     overflow: "hidden",
-                    textOverflow: "ellipsis",  // Add ellipsis for long text
+                    textOverflow: "ellipsis",
                   }}
-                  title={row[header.key]} // Show full content on hover
+                  title={row[header.key]}
                 >
                   {row[header.key]}
                 </td>
@@ -67,7 +68,7 @@ const SortableTable: React.FC<SortableTableProps> = ({ headers, data }) => (
 const getColumnWidth = (key: string) => {
   switch (key) {
     case "title":
-      return "20%";  // Make the title column narrower
+      return "20%";
     case "authors":
       return "25%";
     case "doi":

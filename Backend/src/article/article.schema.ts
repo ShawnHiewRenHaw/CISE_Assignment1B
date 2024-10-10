@@ -1,8 +1,9 @@
-import { Schema, Document } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
 
+// Define the Article interface
 export interface Article {
   title: string;
-  authors: string;
+  authors: string[];
   source: string;
   pubyear: string;
   doi: string;
@@ -11,19 +12,33 @@ export interface Article {
   status: string;
 }
 
-export interface SpeedDocument extends Document {
-  articles: Article[];
+// Extend the Mongoose Document with the Article interface
+export interface ArticleDocument extends Document, Article {
+  _id: Types.ObjectId;  // Use ObjectId type for the ID
 }
 
+// Define and export the Article Schema
+export const ArticleSchema = new Schema({
+  title: { type: String, required: true },
+  authors: { type: [String], required: true },
+  source: { type: String, required: true },
+  pubyear: { type: String, required: true },
+  doi: { type: String, required: true },
+  claim: { type: String, required: true },
+  evidence: { type: String, required: true },
+  status: { type: String, required: true },
+});
+
 export const SpeedSchema = new Schema({
-  articles: [{ 
+  articles: [{
     title: String,
-    authors: String,
+    authors: [String],
     source: String,
     pubyear: String,
     doi: String,
     claim: String,
     evidence: String,
-    status: String, 
+    status: String,
   }],
 });
+
