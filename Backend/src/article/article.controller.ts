@@ -1,38 +1,23 @@
-import { Controller, Post, Body, Get, Param, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Put, Param, Body } from '@nestjs/common';
 import { ArticleService } from './article.service';
-import { CreateArticleDto } from './dto/create-article.dto';
+import { Article } from './article.interface';
 
 @Controller('articles')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @Get()
-  async findAll() {
-    return this.articleService.findApproved();
+  async findAll(): Promise<Article[]> {
+    return this.articleService.findAll();
   }
-  
+
   @Post()
-  create(@Body() createArticleDto: CreateArticleDto) {
-    return this.articleService.create(createArticleDto);
+  async create(@Body() article: Article): Promise<Article> {
+    return this.articleService.create(article);
   }
 
-  @Get('approved')
-  findApproved() {
-    return this.articleService.findApproved();
-  }
-
-  @Get('rejected')
-  findRejected() {
-    return this.articleService.findRejected();
-  }
-
-  @Get('pending')
-  findPending() {
-    return this.articleService.findPending();
-  }
-
-  @Patch(':id/status')
-  updateStatus(@Param('id') id: string, @Body('status') status: string) {
+  @Put(':id')
+  async updateStatus(@Param('id') id: string, @Body('status') status: string): Promise<Article> {
     return this.articleService.updateStatus(id, status);
   }
 }

@@ -20,7 +20,7 @@ type ArticlesProps = {
 const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   const [searchQuery, setSearchQuery] = useState<string>(""); // Search input
   const [filterColumn, setFilterColumn] = useState<string>(""); // Selected column to filter by
-  const [ratings, setRatings] = useState<Record<string, number | string>>({}); // Track ratings by article ID
+  const [ratings, setRatings] = useState<Record<string, number | string>>({}); // Track ratings
 
   const headers: { key: keyof ArticlesInterface | 'rating'; label: string }[] = [
     { key: "title", label: "Title" },
@@ -36,7 +36,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   const handleRatingChange = (articleId: string, rating: string) => {
     setRatings((prevRatings) => ({
       ...prevRatings,
-      [articleId]: rating, // Isolate ratings by article ID
+      [articleId]: rating,
     }));
   };
 
@@ -95,11 +95,10 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
         headers={headers}
         data={filteredArticles.map((article) => ({
           ...article,
-          // Attach the rating dropdown specific to each article
           rating: (
             <select
               onChange={(e) => handleRatingChange(article.id, e.target.value)}
-              value={ratings[article.id] || ""} // Ensure each article has its unique rating
+              value={ratings[article.id] || ""}
               style={{ padding: '5px' }}
             >
               <option value="">Rate</option>
@@ -109,7 +108,6 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
             </select>
           )
         }))}
-        rowKey={(article) => article.id} // Ensure each row has a unique key based on article ID
       />
     </div>
   );
@@ -117,25 +115,23 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
 
 // Fetch data from the NestJS backend
 export const getServerSideProps = async () => {
-  const res = await fetch('http://localhost:3001/articles'); // Ensure the URL is correct
+  const res = await fetch('http://localhost:3001/articles');
   const articles = await res.json();
 
-  console.log("Fetched Articles:", articles); // Log the fetched data for debugging
+  console.log("Fetched Articles:", articles); // Log fetched data
 
   return {
     props: {
-      articles: Array.isArray(articles) 
-        ? articles.map((article: any) => ({
-            id: article._id || null,  // Ensure each article has an id
-            title: article.title,
-            authors: article.authors,
-            source: article.source,
-            pubyear: article.pubyear,
-            doi: article.doi,
-            claim: article.claim,
-            evidence: article.evidence,
-          }))
-        : [], // If articles is not an array, fallback to an empty array
+      articles: Array.isArray(articles) ? articles.map((article: any) => ({
+        id: article._id || null, 
+        title: article.title,
+        authors: article.authors,
+        source: article.source,
+        pubyear: article.pubyear,
+        doi: article.doi,
+        claim: article.claim,
+        evidence: article.evidence,
+      })) : [],
     },
   };
 };
