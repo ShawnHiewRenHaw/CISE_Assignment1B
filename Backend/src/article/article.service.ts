@@ -6,7 +6,7 @@ import { Article } from './article.interface';
 @Injectable()
 export class ArticleService {
   constructor(
-    @InjectModel('Article') private readonly articleModel: Model<Article>
+    @InjectModel('Speed') private readonly articleModel: Model<Article>
   ) {}
 
   async findAll(): Promise<Article[]> {
