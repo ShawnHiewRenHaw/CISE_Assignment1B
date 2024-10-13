@@ -1,6 +1,7 @@
-import { GetServerSideProps, NextPage } from "next";
+import { GetStaticProps, NextPage } from "next";
 import { useState } from "react";
 import SortableTable from "../../components/table/SortableTable";
+import data from "../../utils/dummydata";
 
 interface ArticlesInterface {
   id: string;
@@ -20,7 +21,7 @@ type ArticlesProps = {
 const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   const [searchQuery, setSearchQuery] = useState<string>(""); // Search input
   const [filterColumn, setFilterColumn] = useState<string>(""); // Selected column to filter by
-  const [ratings, setRatings] = useState<Record<string, number | string>>({}); // Track ratings by article ID
+  const [ratings, setRatings] = useState<Record<string, number | string>>({}); // Track ratings
 
   const headers: { key: keyof ArticlesInterface | 'rating'; label: string }[] = [
     { key: "title", label: "Title" },
@@ -36,7 +37,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   const handleRatingChange = (articleId: string, rating: string) => {
     setRatings((prevRatings) => ({
       ...prevRatings,
-      [articleId]: rating, // Isolate ratings by article ID
+      [articleId]: rating,
     }));
   };
 
@@ -95,11 +96,10 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
         headers={headers}
         data={filteredArticles.map((article) => ({
           ...article,
-          // Attach the rating dropdown specific to each article
           rating: (
             <select
               onChange={(e) => handleRatingChange(article.id, e.target.value)}
-              value={ratings[article.id] || ""} // Ensure each article has its unique rating
+              value={ratings[article.id] || ""}
               style={{ padding: '5px' }}
             >
               <option value="">Rate</option>
@@ -114,28 +114,23 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   );
 };
 
-// Fetch data from the NestJS backend
-// Fetch data from the NestJS backend, specifically approved articles
-export const getServerSideProps = async () => {
-  const res = await fetch('http://localhost:3001/articles/approved'); // Updated URL to fetch only approved articles
-  const articles = await res.json();
-
-  console.log("Fetched Approved Articles:", articles); // Log the fetched data for debugging
+// Static Props fetching
+export const getStaticProps: GetStaticProps<ArticlesProps> = async (_) => {
+  // Map the data to ensure all articles have consistent property names
+  const articles = data.map((article) => ({
+    id: article.id ?? article._id,
+    title: article.title,
+    authors: article.authors,
+    source: article.source,
+    pubyear: article.pubyear,
+    doi: article.doi,
+    claim: article.claim,
+    evidence: article.evidence,
+  }));
 
   return {
     props: {
-      articles: Array.isArray(articles) 
-        ? articles.map((article: any) => ({
-            id: article._id || null,  // Ensure each article has an id
-            title: article.title,
-            authors: article.authors,
-            source: article.source,
-            pubyear: article.pubyear,
-            doi: article.doi,
-            claim: article.claim,
-            evidence: article.evidence,
-          }))
-        : [], // If articles is not an array, fallback to an empty array
+      articles,
     },
   };
 };
