@@ -9,32 +9,57 @@ const NewDiscussion = () => {
   const [doi, setDoi] = useState("");
   const [summary, setSummary] = useState("");
   const [linkedDiscussion, setLinkedDiscussion] = useState("");
+  const [error, setError] = useState<string | null>(null); // For handling errors
+  const [success, setSuccess] = useState<boolean>(false); // For showing success message
 
   const submitNewArticle = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    console.log(
-      JSON.stringify({
-        title,
-        authors,
-        source,
-        publication_year: pubYear,
-        doi,
-        summary,
-        linked_discussion: linkedDiscussion,
-      })
-    );
+    const newArticle = {
+      title,
+      authors,
+      source,
+      pubYear,
+      doi,
+      summary,
+      linked_discussion: linkedDiscussion,
+      status: "pending", 
+    };
+
+    try {
+      const res = await fetch("http://localhost:3001/articles", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newArticle),
+      });
+
+      if (res.ok) {
+        setSuccess(true);
+        setTitle("");
+        setAuthors([]);
+        setSource("");
+        setPubYear(0);
+        setDoi("");
+        setSummary("");
+        setLinkedDiscussion("");
+      } else {
+        const errorData = await res.json();
+        setError(errorData.message || "Failed to submit article");
+      }
+    } catch (err) {
+      setError("Failed to submit article. Please try again.");
+    }
   };
 
   // Some helper methods for the authors array
-
   const addAuthor = () => {
     setAuthors(authors.concat([""]));
   };
   const removeAuthor = (index: number) => {
     setAuthors(authors.filter((_, i) => i !== index));
   };
-
   const changeAuthor = (index: number, value: string) => {
     setAuthors(
       authors.map((oldValue, i) => {
@@ -44,10 +69,11 @@ const NewDiscussion = () => {
   };
 
   // Return the full form
-
   return (
     <div className="container">
       <h1>New Article</h1>
+      {success && <p style={{ color: "green" }}>Article submitted successfully and is now pending approval.</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <form className={formStyles.form} onSubmit={submitNewArticle}>
         <label htmlFor="title">Title:</label>
         <input

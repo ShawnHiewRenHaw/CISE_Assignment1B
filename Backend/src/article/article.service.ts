@@ -11,18 +11,22 @@ export class ArticleService {
   ) {}
 
   async findAll(): Promise<Article[]> {
-    try {
       const document = await this.speedModel.findOne().exec();
-      console.log('Document fetched:', document); // Log the fetched document
       return document ? document.articles : [];
-    } catch (error) {
-      console.error('Error fetching articles:', error);
-      throw new Error('Database error');
-    }
   }    
+
+  async findApproved(): Promise<Article[]> {
+    const document = await this.speedModel.findOne({ 'articles.status': 'approved' }).exec();
+
+    // Filter only approved articles
+    const approvedArticles = document.articles.filter((article: Article) => article.status === 'approved');
+    
+    return approvedArticles;
+  }
 
   async create(article: Article): Promise<Article> {
     const document = await this.speedModel.findOne().exec();
+
     document.articles.push({
       title: article.title,
       authors: article.authors,
@@ -31,22 +35,10 @@ export class ArticleService {
       doi: article.doi,
       claim: article.claim,
       evidence: article.evidence,
-      status: article.status || 'pending',
+      status: 'pending', // Ensure status is set to pending
     });
+
     await document.save();
     return article;
   }
-  
-  async updateStatus(id: string, status: string): Promise<Article> {
-    const document = await this.speedModel.findOne().exec();
-  
-    const article = document.articles.find((a: Article) => a._id.toString() === id); 
-  
-    if (article) {
-      article.status = status;
-      await document.save(); 
-    }
-  
-    return article;
-  }  
 }
