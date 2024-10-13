@@ -28,3 +28,17 @@ export const ArticleSchema = new Schema({
   evidence: { type: String, required: true },
   status: { type: String, required: true },
 });
+
+export const SpeedSchema = new Schema({
+  articles: [{
+    title: String,
+    authors: [String],
+    source: String,
+    pubyear: String,
+    doi: String,
+    claim: String,
+    evidence: String,
+    status: String,
+  }],
+});
+

@@ -7,7 +7,7 @@ import { CreateArticleDto } from './dto/create-article.dto';
 @Injectable()
 export class ArticleService {
   constructor(
-    @InjectModel('Speed') private readonly articleModel: Model<ArticleDocument>
+    @InjectModel('Article') private readonly articleModel: Model<ArticleDocument>
   ) {}
 
   // Create a new article submission
@@ -19,8 +19,8 @@ export class ArticleService {
 
   // Get all approved articles
   async findApproved(): Promise<ArticleDocument[]> {
-    return this.articleModel.find({ 'articles.status': 'approved' }).exec();
-  }  
+    return this.articleModel.find({ status: 'approved' }).exec();
+  }
 
   // Get all rejected articles
   async findRejected(): Promise<ArticleDocument[]> {

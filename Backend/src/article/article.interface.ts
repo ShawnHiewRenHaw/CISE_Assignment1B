@@ -1,8 +1,8 @@
 export interface Article {
   title: string;
-  authors: string[];  
+  authors: string[];
   source: string;
-  pubyear: string;  
+  pubyear: string;
   doi: string;
   claim: string;
   evidence: string;
