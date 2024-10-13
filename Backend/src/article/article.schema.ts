@@ -1,29 +1,25 @@
 import { Schema, Document } from 'mongoose';
 
-export interface SpeedDocument extends Document {
-  articles: {
-    title: string;
-    authors: string[];
-    source: string;
-    pubyear: number;
-    doi: string;
-    claim: string;
-    evidence: string;
-    status: string;
-  }[];
+export interface Article extends Document {
+  id: string; 
+  title: string;
+  authors: string[];
+  source: string;
+  pubyear: number;
+  doi: string;
+  claim: string;
+  evidence: string; 
+  status: string;
 }
 
-export const SpeedSchema = new Schema({
-  articles: [
-    {
-      title: String,
-      authors: [String],
-      source: String,
-      pubyear: Number,
-      doi: String,
-      claim: String,
-      evidence: String,
-      status: String,
-    },
-  ],
+export const ArticleSchema = new Schema({
+  id: { type: String }, 
+  title: { type: String, required: true },
+  authors: { type: [String], required: true },
+  source: { type: String },
+  pubyear: { type: Number },
+  doi: { type: String },
+  claim: { type: String },
+  evidence: { type: String }, 
+  status: { type: String, required: true },
 });

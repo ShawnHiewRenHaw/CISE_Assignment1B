@@ -2,43 +2,42 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Article } from './article.interface'; 
-import { SpeedDocument } from './article.schema';
 
 @Injectable()
 export class ArticleService {
   constructor(
-    @InjectModel('Speed') private readonly speedModel: Model<SpeedDocument>
+    @InjectModel('Article') private readonly articleModel: Model<Article>
   ) {}
 
   async findAll(): Promise<Article[]> {
-      const document = await this.speedModel.findOne().exec();
-      return document ? document.articles : [];
+    return this.articleModel.find().exec(); 
   }    
 
   async findApproved(): Promise<Article[]> {
-    const document = await this.speedModel.findOne({ 'articles.status': 'approved' }).exec();
-
-    // Filter only approved articles
-    const approvedArticles = document.articles.filter((article: Article) => article.status === 'approved');
-    
-    return approvedArticles;
+    return this.articleModel.find({ status: 'approved' }).exec(); 
   }
 
   async create(article: Article): Promise<Article> {
-    const document = await this.speedModel.findOne().exec();
+    const lastArticle = await this.articleModel.findOne().sort({ id: -1 }).exec();
+    const newId = lastArticle ? (parseInt(lastArticle.id) + 1).toString() : "1";
 
-    document.articles.push({
-      title: article.title,
-      authors: article.authors,
-      source: article.source,
-      pubyear: article.pubyear,
-      doi: article.doi,
-      claim: article.claim,
-      evidence: article.evidence,
-      status: 'pending', // Ensure status is set to pending
+    const newArticle = new this.articleModel({
+      ...article,
+      id: newId,
     });
+    return newArticle.save(); 
+  }
 
-    await document.save();
-    return article;
+  async updateStatus(id: string, status: string, evidence: string): Promise<Article | null> {
+    const article = await this.articleModel.findById(id).exec(); 
+
+    if (article) {
+      article.status = status; 
+      article.evidence = evidence; 
+      await article.save(); 
+      return article;
+    }
+
+    return null; 
   }
 }

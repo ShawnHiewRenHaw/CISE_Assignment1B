@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Param, Body } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { Article } from './article.interface';
-import { CreateArticleDto  } from './dto/create-article.dto';
+import { CreateArticleDto } from './dto/create-article.dto';
 
 @Controller('articles')
 export class ArticleController {
@@ -18,7 +18,16 @@ export class ArticleController {
   }
 
   @Post()
-  async create(@Body() createArticleDto: CreateArticleDto ): Promise<Article> {
+  async create(@Body() createArticleDto: CreateArticleDto): Promise<Article> {
     return this.articleService.create(createArticleDto);
+  }
+
+  @Put(':id')
+  async updateStatus(
+    @Param('id') id: string,
+    @Body('status') status: string,
+    @Body('evidence') evidence: string 
+  ): Promise<Article> {
+    return this.articleService.updateStatus(id, status, evidence); 
   }
 }

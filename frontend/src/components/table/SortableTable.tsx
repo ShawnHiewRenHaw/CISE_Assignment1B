@@ -14,12 +14,12 @@ const SortableTable: React.FC<SortableTableProps> = ({ headers, data }) => (
             <th
               key={header.key}
               style={{
-                padding: "16px",  // Increase padding for bigger header rows
+                padding: "16px",  // Increased padding for better spacing
                 borderBottom: "2px solid #ddd",
                 backgroundColor: "#f9f9f9",
                 textAlign: "left",
-                width: getColumnWidth(header.key),  // Set specific column width
-                minWidth: "80px",  // Ensure a reasonable minimum width
+                width: getColumnWidth(header.key),  // Dynamic column width
+                minWidth: "80px",  // Ensures a reasonable minimum width
               }}
             >
               {header.label}
@@ -35,16 +35,16 @@ const SortableTable: React.FC<SortableTableProps> = ({ headers, data }) => (
                 <td
                   key={header.key}
                   style={{
-                    padding: "16px",  // Increase padding for bigger rows
+                    padding: "16px",  // Increased padding for better spacing
                     borderBottom: "1px solid #ddd",
                     textAlign: "left",
-                    whiteSpace: "normal",  // Allow text to wrap within the cells
+                    whiteSpace: "normal",  // Allows text to wrap within the cells
                     wordWrap: "break-word",
                     maxWidth: "200px",  // Max width for cells (especially for title)
                     overflow: "hidden",
-                    textOverflow: "ellipsis",  // Add ellipsis for long text
+                    textOverflow: "ellipsis",  // Adds ellipsis for long text
                   }}
-                  title={row[header.key]} // Show full content on hover
+                  title={row[header.key]} // Tooltip to show full content on hover
                 >
                   {row[header.key]}
                 </td>
@@ -67,13 +67,23 @@ const SortableTable: React.FC<SortableTableProps> = ({ headers, data }) => (
 const getColumnWidth = (key: string) => {
   switch (key) {
     case "title":
-      return "20%";  // Make the title column narrower
+      return "30%";  // Make the title column wider
     case "authors":
-      return "25%";
+      return "20%";  // Adjusted width for authors
+    case "source":
+      return "15%";  // Added width for source
+    case "pubyear":
+      return "10%";  // Added width for publication year
     case "doi":
-      return "15%";
+      return "15%";  // Width for DOI
+    case "claim":
+      return "20%";  // Width for claim
+    case "evidence":
+      return "15%";  // Width for evidence
+    case "status":
+      return "10%";  // Width for status buttons
     default:
-      return "auto";
+      return "auto";  // Default for other columns
   }
 };
 

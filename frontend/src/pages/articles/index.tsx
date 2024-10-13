@@ -1,12 +1,12 @@
-import { GetStaticProps, NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import { useState } from "react";
 import SortableTable from "../../components/table/SortableTable";
-import data from "../../utils/dummydata";
+import formStyles from "../../styles/Form.module.scss"; 
 
 interface ArticlesInterface {
   id: string;
   title: string;
-  authors: string;
+  authors: string[];
   source: string;
   pubyear: string;
   doi: string;
@@ -21,7 +21,7 @@ type ArticlesProps = {
 const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   const [searchQuery, setSearchQuery] = useState<string>(""); // Search input
   const [filterColumn, setFilterColumn] = useState<string>(""); // Selected column to filter by
-  const [ratings, setRatings] = useState<Record<string, number | string>>({}); // Track ratings
+  const [ratings, setRatings] = useState<Record<string, number | string>>({}); // Track ratings by article ID
 
   const headers: { key: keyof ArticlesInterface | 'rating'; label: string }[] = [
     { key: "title", label: "Title" },
@@ -37,7 +37,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   const handleRatingChange = (articleId: string, rating: string) => {
     setRatings((prevRatings) => ({
       ...prevRatings,
-      [articleId]: rating,
+      [articleId]: rating, // Isolate ratings by article ID
     }));
   };
 
@@ -62,12 +62,11 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
         placeholder="Search articles..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="search-input"
+        className={formStyles.formItem} // Use form styles for consistency
         style={{
-          padding: "10px",
-          marginBottom: "20px",
+          marginBottom: "1em",
           width: "100%",
-          fontSize: "16px",
+          maxWidth: "30em", // Optional: limit the width
         }}
       />
 
@@ -80,7 +79,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
           id="filter-column"
           value={filterColumn}
           onChange={(e) => setFilterColumn(e.target.value)}
-          style={{ padding: "10px", fontSize: "16px" }}
+          className={formStyles.formItem} // Consistent styling for the select
         >
           <option value="">All Columns</option>
           {headers.map((header) => (
@@ -96,10 +95,12 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
         headers={headers}
         data={filteredArticles.map((article) => ({
           ...article,
+          // Attach the rating dropdown specific to each article
           rating: (
             <select
               onChange={(e) => handleRatingChange(article.id, e.target.value)}
-              value={ratings[article.id] || ""}
+              value={ratings[article.id] || ""} // Ensure each article has its unique rating
+              className={formStyles.formItem} // Consistent styling for rating dropdown
               style={{ padding: '5px' }}
             >
               <option value="">Rate</option>
@@ -114,23 +115,28 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   );
 };
 
-// Static Props fetching
-export const getStaticProps: GetStaticProps<ArticlesProps> = async (_) => {
-  // Map the data to ensure all articles have consistent property names
-  const articles = data.map((article) => ({
-    id: article.id ?? article._id,
-    title: article.title,
-    authors: article.authors,
-    source: article.source,
-    pubyear: article.pubyear,
-    doi: article.doi,
-    claim: article.claim,
-    evidence: article.evidence,
-  }));
+// Fetch data from the NestJS backend
+export const getServerSideProps: GetServerSideProps = async () => {
+  const res = await fetch('http://localhost:3001/articles');
+  const articles = await res.json();
+
+  // Filter to only include approved articles
+  const approvedArticles = articles.filter((article: any) => article.status === "approved");
 
   return {
     props: {
-      articles,
+      articles: Array.isArray(approvedArticles) 
+        ? approvedArticles.map((article: any) => ({
+            id: article._id || null,  // Ensure each article has an id
+            title: article.title,
+            authors: article.authors,
+            source: article.source,
+            pubyear: article.pubyear,
+            doi: article.doi,
+            claim: article.claim,
+            evidence: article.evidence,
+          }))
+        : [], // If articles is not an array, fallback to an empty array
     },
   };
 };
