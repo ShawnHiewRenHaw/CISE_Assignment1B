@@ -28,3 +28,20 @@
   flex-grow: 0;
   font-size: 1.5em;
 }
+
+.center-container {
+  display: flex;
+  justify-content: center;  /* Center horizontally */
+  align-items: center;      /* Center vertically */
+  height: 100vh;           /* Full height of the viewport */
+  background-color: #f0f0f0; /* Optional: light background for contrast */
+}
+
+.form-container {
+  width: 100%;              /* Ensure full width for responsiveness */
+  max-width: 30em;         /* Limit max width to match your form */
+  padding: 2em;            /* Additional padding for spacing */
+  border-radius: 8px;      /* Optional: rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  background-color: white; /* White background for form container */
+}
