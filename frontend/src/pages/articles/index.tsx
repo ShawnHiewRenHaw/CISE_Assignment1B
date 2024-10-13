@@ -99,7 +99,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
           rating: (
             <select
               onChange={(e) => handleRatingChange(article.id, e.target.value)}
-              value={ratings[article.id] || ""} // Ensure each article has its unique rating
+              value={ratings[article.id] || ""}
               style={{ padding: '5px' }}
             >
               <option value="">Rate</option>
@@ -109,7 +109,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
             </select>
           )
         }))}
-        rowKey={(article) => article.id} // Ensure each row has a unique key based on article ID
+        rowKey={(article) => article.id} 
       />
     </div>
   );
@@ -117,7 +117,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
 
 // Fetch data from the NestJS backend
 export const getServerSideProps = async () => {
-  const res = await fetch('http://localhost:3001/articles'); // Ensure the URL is correct
+  const res = await fetch('http://localhost:3001/articles'); 
   const articles = await res.json();
 
   console.log("Fetched Articles:", articles); // Log the fetched data for debugging
@@ -126,7 +126,7 @@ export const getServerSideProps = async () => {
     props: {
       articles: Array.isArray(articles) 
         ? articles.map((article: any) => ({
-            id: article._id || null,  // Ensure each article has an id
+            id: article._id || null,  
             title: article.title,
             authors: article.authors,
             source: article.source,
@@ -135,7 +135,7 @@ export const getServerSideProps = async () => {
             claim: article.claim,
             evidence: article.evidence,
           }))
-        : [], // If articles is not an array, fallback to an empty array
+        : [], 
     },
   };
 };

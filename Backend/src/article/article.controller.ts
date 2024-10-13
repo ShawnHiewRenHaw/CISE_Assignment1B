@@ -8,8 +8,10 @@ export class ArticleController {
 
   @Get()
   async findAll() {
-    return this.articleService.findApproved();
-  }
+    const articles = await this.articleService.findApproved();
+    console.log("Fetched Articles from DB:", JSON.stringify(articles, null, 2));
+    return articles;
+  }  
   
   @Post()
   create(@Body() createArticleDto: CreateArticleDto) {
