@@ -7,4 +7,7 @@ export class CreateArticleDto {
   claim?: string;
   evidence?: string;
   status: string;
+  research: string;
+  participant: string;
+  email: string;
 }

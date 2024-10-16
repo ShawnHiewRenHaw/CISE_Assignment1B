@@ -2,27 +2,31 @@ import { FormEvent, useState } from "react";
 import formStyles from "../../styles/Form.module.scss";
 
 const NewDiscussion = () => {
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState<string>("");
   const [authors, setAuthors] = useState<string[]>([]);
-  const [source, setSource] = useState("");
-  const [pubYear, setPubYear] = useState<number | "">("");
-  const [doi, setDoi] = useState("");
-  const [summary, setSummary] = useState("");
-  const [linkedDiscussion, setLinkedDiscussion] = useState("");
+  const [source, setSource] = useState<string>("");
+  const [pubYear, setPubYear] = useState<number | null>(null);
+  const [doi, setDoi] = useState<string>("");
+  const [summary, setSummary] = useState<string>("");
+  const [linkedDiscussion, setLinkedDiscussion] = useState<string>("");
+  const [email, setEmail] = useState<string>(""); // New state for email
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
 
   const submitNewArticle = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+     
+
     const newArticle = {
       title,
       authors: authors.filter(author => author.trim() !== ""),
-      source: source.trim() || undefined,
-      pubyear: pubYear || undefined,
-      doi: doi.trim() || undefined,
-      claim: summary.trim() || undefined, // Use summary as claim
+      source: source.trim() || null,
+      pubyear: pubYear !== null ? pubYear : null,
+      doi: doi.trim() || null,
+      claim: summary.trim() || null,
       status: "pending", // Ensure status is pending
+      email: email.trim() || null, // Include email in the new article data
     };
 
     try {
@@ -36,13 +40,15 @@ const NewDiscussion = () => {
 
       if (res.ok) {
         setSuccess(true);
+        // Reset form fields
         setTitle("");
         setAuthors([]);
         setSource("");
-        setPubYear("");
+        setPubYear(null);
         setDoi("");
         setSummary("");
         setLinkedDiscussion("");
+        setEmail(""); // Reset email
         setError(null);
       } else {
         const errorData = await res.json();
@@ -88,7 +94,7 @@ const NewDiscussion = () => {
 
           <label htmlFor="author">Authors (optional):</label>
           {authors.map((author, index) => (
-            <div key={`author ${index}`} className={formStyles.arrayItem}>
+            <div key={`author-${index}`} className={formStyles.arrayItem}>
               <input
                 type="text"
                 name="author"
@@ -131,10 +137,10 @@ const NewDiscussion = () => {
             type="number"
             name="pubYear"
             id="pubYear"
-            value={pubYear === "" ? "" : pubYear}
+            value={pubYear !== null ? pubYear : ""}
             onChange={(event) => {
               const val = event.target.value;
-              setPubYear(val === "" ? "" : parseInt(val));
+              setPubYear(val === "" ? null : parseInt(val));
             }}
           />
 
@@ -154,6 +160,17 @@ const NewDiscussion = () => {
             name="summary"
             value={summary}
             onChange={(event) => setSummary(event.target.value)}
+          />
+
+          <label htmlFor="email">Your Email:</label> {/* New email field */}
+          <input
+            className={formStyles.formItem}
+            type="email"
+            name="email"
+            id="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required // Ensure this field is required
           />
 
           <button className={formStyles.formItem} type="submit">
