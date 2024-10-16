@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextPage } from "next";
 import { useState, useEffect } from "react";
 import SortableTable from "../../components/table/SortableTable";
+import formStyles from "../../styles/Form.module.scss"; // Import the styles
 
 interface ArticleInterface {
   id: string;
@@ -81,6 +83,12 @@ const ModeratorPage: NextPage = () => {
     }
   };
 
+  // Check for duplicates (you should implement this function to check against your dataset)
+  const isDuplicate = (article: ArticleInterface): boolean => {
+    // Example: Check if an article title already exists in the articles list
+    return articles.some((a) => a.title === article.title && a.id !== article.id);
+  };
+
   return (
     <div className="container">
       <h1>Moderator Page</h1>
@@ -113,9 +121,12 @@ const ModeratorPage: NextPage = () => {
             </select>
           ),
           status: (
-            <div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               <button onClick={() => handleApproval(article.id, "approved")}>Approve</button>
               <button onClick={() => handleApproval(article.id, "rejected")}>Reject</button>
+              {isDuplicate(article) && (
+                <span style={{ color: 'red', marginLeft: '8px' }}>(Duplicate)</span>
+              )}
             </div>
           ),
         }))}

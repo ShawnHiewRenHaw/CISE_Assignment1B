@@ -10,16 +10,19 @@ export interface Article extends Document {
   claim: string;
   evidence: string; 
   status: string;
+  research: string;
+  participant: string;
 }
 
 export const ArticleSchema = new Schema({
-  id: { type: String }, 
   title: { type: String, required: true },
   authors: { type: [String], required: true },
-  source: { type: String },
-  pubyear: { type: Number },
-  doi: { type: String },
-  claim: { type: String },
-  evidence: { type: String }, 
-  status: { type: String, required: true },
+  source: { type: String, required: true },
+  pubyear: { type: Number, required: true },
+  doi: { type: String, required: true },
+  claim: { type: String, required: true },
+  evidence: { type: String, required: false },
+  status: { type: String, enum: ['pending', 'approved', 'rejected'], required: true },
+  research: { type: String, required: false },  // Optional field
+  participant: { type: String, required: false } // Optional field
 });

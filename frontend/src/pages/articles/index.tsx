@@ -1,27 +1,44 @@
 import { GetServerSideProps, NextPage } from "next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SortableTable from "../../components/table/SortableTable";
-import formStyles from "../../styles/Form.module.scss"; 
+import formStyles from "../../styles/Form.module.scss";
 
 interface ArticlesInterface {
   id: string;
   title: string;
   authors: string[];
-  source: string;
-  pubyear: string;
-  doi: string;
-  claim: string;
-  evidence: string;
+  source: string | null; // Changed to allow null
+  pubyear: number | null; // Changed to allow null
+  doi: string | null; // Changed to allow null
+  claim: string | null; // Changed to allow null
+  evidence: string | null; // Changed to allow null
+  research: string | null; // Changed to allow null
+  participant: string | null; // Changed to allow null
 }
 
 type ArticlesProps = {
   articles: ArticlesInterface[];
 };
 
+const claimsOptions = [
+  { value: "code quality improvement", label: "Code Quality Improvement" },
+  { value: "product quality improvement", label: "Product Quality Improvement" },
+];
+
+const sePracticesOptions = [
+  { value: "practice1", label: "SE Practice 1" },
+  { value: "practice2", label: "SE Practice 2" },
+  { value: "practice3", label: "SE Practice 3" },
+  // Add more practices as needed
+];
+
 const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   const [searchQuery, setSearchQuery] = useState<string>(""); // Search input
   const [filterColumn, setFilterColumn] = useState<string>(""); // Selected column to filter by
+  const [selectedClaim, setSelectedClaim] = useState<string | null>(null); // Selected claim
+  const [selectedPractice, setSelectedPractice] = useState<string | null>(null); // Selected SE practice
   const [ratings, setRatings] = useState<Record<string, number | string>>({}); // Track ratings by article ID
+  const [columnVisibility, setColumnVisibility] = useState<boolean[]>([]); // Track visibility of each column
 
   const headers: { key: keyof ArticlesInterface | 'rating'; label: string }[] = [
     { key: "title", label: "Title" },
@@ -32,7 +49,16 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
     { key: "doi", label: "DOI" },
     { key: "claim", label: "Claim" },
     { key: "evidence", label: "Evidence" },
+    { key: "research", label: "Research" },
+    { key: "participant", label: "Participant" },
   ];
+
+  // Initialize columnVisibility based on headers
+  useEffect(() => {
+    if (columnVisibility.length === 0) {
+      setColumnVisibility(Array(headers.length).fill(true)); // Set all columns visible by default
+    }
+  }, [columnVisibility.length]);
 
   const handleRatingChange = (articleId: string, rating: string) => {
     setRatings((prevRatings) => ({
@@ -41,20 +67,31 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
     }));
   };
 
-  // Filter articles based on the selected column and search query
+  // Filter articles based on the selected claim, practice, and search query
   const filteredArticles = articles.filter((article) => {
-    if (!filterColumn) return true; // If no filter is selected, show all
-    const columnValue = article[filterColumn as keyof ArticlesInterface];
-    return columnValue
-      ?.toString()
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+    const matchesSearchQuery = Object.keys(article).some((key) => {
+      const value = article[key as keyof ArticlesInterface];
+      return value?.toString().toLowerCase().includes(searchQuery.toLowerCase());
+    });
+
+    const matchesClaim = selectedClaim ? article.claim === selectedClaim : true;
+    const matchesPractice = selectedPractice ? article.evidence?.toLowerCase().includes(selectedPractice.toLowerCase()) : true;
+
+    return matchesSearchQuery && matchesClaim && matchesPractice;
   });
 
+  // Toggle column visibility
+  const toggleColumn = (index: number) => {
+    setColumnVisibility((prevVisibility) => {
+      const newVisibility = [...prevVisibility];
+      newVisibility[index] = !newVisibility[index]; // Toggle visibility
+      return newVisibility;
+    });
+  };
+
   return (
-    <div className="container">
-      <h1>Articles Index Page</h1>
-      <p>Page containing a table of articles with search and filter options:</p>
+    <main id="main">
+      <h1 className="projectName">Articles Index Page</h1>
 
       {/* Search input */}
       <input
@@ -62,45 +99,63 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
         placeholder="Search articles..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className={formStyles.formItem} // Use form styles for consistency
-        style={{
-          marginBottom: "1em",
-          width: "100%",
-          maxWidth: "30em", // Optional: limit the width
-        }}
+        className={formStyles.formItem}
+        style={{ marginBottom: "1em", width: "100%", maxWidth: "30em" }} 
       />
 
-      {/* Filter by column */}
-      <div style={{ marginBottom: "20px" }}>
-        <label htmlFor="filter-column" style={{ marginRight: "10px" }}>
-          Filter by:
-        </label>
-        <select
-          id="filter-column"
-          value={filterColumn}
-          onChange={(e) => setFilterColumn(e.target.value)}
-          className={formStyles.formItem} // Consistent styling for the select
-        >
-          <option value="">All Columns</option>
-          {headers.map((header) => (
-            <option key={header.key} value={header.key}>
-              {header.label}
-            </option>
-          ))}
-        </select>
+      {/* Claim Dropdown */}
+      <label htmlFor="claim">Select Claim:</label>
+      <select
+        id="claim"
+        value={selectedClaim || ""}
+        onChange={(e) => setSelectedClaim(e.target.value || null)}
+        className={formStyles.formItem}
+      >
+        <option value="">All Claims</option>
+        {claimsOptions.map((option) => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </select>
+
+      {/* SE Practices Dropdown */}
+      <label htmlFor="sePractices">Select SE Practice:</label>
+      <select
+        id="sePractices"
+        value={selectedPractice || ""}
+        onChange={(e) => setSelectedPractice(e.target.value || null)}
+        className={formStyles.formItem}
+      >
+        <option value="">All Practices</option>
+        {sePracticesOptions.map((option) => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </select>
+
+      {/* Column Visibility Checkboxes */}
+      <div className={formStyles.columnVisibility}>
+        <h2>Hide Columns</h2>
+        {headers.map((header, index) => (
+          <div key={header.key}>
+            <input
+              type="checkbox"
+              checked={columnVisibility[index]}
+              onChange={() => toggleColumn(index)}
+            />
+            <label>{header.label}</label>
+          </div>
+        ))}
       </div>
 
       {/* Sortable table with filtered articles and rating column */}
       <SortableTable
-        headers={headers}
+        headers={headers.filter((_, index) => columnVisibility[index])} 
         data={filteredArticles.map((article) => ({
           ...article,
-          // Attach the rating dropdown specific to each article
           rating: (
             <select
               onChange={(e) => handleRatingChange(article.id, e.target.value)}
-              value={ratings[article.id] || ""} // Ensure each article has its unique rating
-              className={formStyles.formItem} // Consistent styling for rating dropdown
+              value={ratings[article.id] || ""}
+              className={formStyles.formItem}
               style={{ padding: '5px' }}
             >
               <option value="">Rate</option>
@@ -111,7 +166,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
           )
         }))}
       />
-    </div>
+    </main>
   );
 };
 
@@ -125,16 +180,18 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   return {
     props: {
-      articles: Array.isArray(approvedArticles) 
+      articles: Array.isArray(approvedArticles)
         ? approvedArticles.map((article: any) => ({
             id: article._id || null,  // Ensure each article has an id
-            title: article.title,
-            authors: article.authors,
-            source: article.source,
-            pubyear: article.pubyear,
-            doi: article.doi,
-            claim: article.claim,
-            evidence: article.evidence,
+            title: article.title || null,
+            authors: article.authors || [], // Ensure authors is an array, default to empty
+            source: article.source || null, // Handle source
+            pubyear: article.pubyear || null, // Handle pubyear
+            doi: article.doi || null, // Handle doi
+            claim: article.claim || null, // Handle claim
+            evidence: article.evidence || null, // Handle evidence
+            research: article.research || null, // Handle evidence
+            participant: article.participant || null, // Handle evidence
           }))
         : [], // If articles is not an array, fallback to an empty array
     },

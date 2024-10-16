@@ -26,8 +26,12 @@ export class ArticleController {
   async updateStatus(
     @Param('id') id: string,
     @Body('status') status: string,
-    @Body('evidence') evidence: string 
+    @Body('evidence') evidence: string, 
+    @Body('research') research: string, 
+    @Body('participant') participant: string 
   ): Promise<Article> {
-    return this.articleService.updateStatus(id, status, evidence); 
+    return this.articleService.updateStatus(id, status, evidence, research, participant); 
   }
+
+  
 }

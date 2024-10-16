@@ -72,3 +72,20 @@ $success-color: green; // Success message color
     font-weight: bold;
     margin-top: 0.5em;
 }
+
+/**/
+.columnVisibility {
+    margin-bottom: 20px;
+    
+    h2 {
+      margin-bottom: 10px;
+    }
+  
+    div {
+      margin-bottom: 5px;
+      
+      label {
+        margin-left: 5px; // Add space between checkbox and label
+      }
+    }
+  }

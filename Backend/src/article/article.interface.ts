@@ -8,4 +8,6 @@ export interface Article {
   claim?: string;
   evidence?: string;
   status: string;
+  research: string;
+  participant: string;
 }
