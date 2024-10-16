@@ -45,3 +45,89 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
   background-color: white; /* White background for form container */
 }
+
+
+/**/
+#main {
+  background-color: #fdfafa;  /* Light background */
+  height: 100%;
+  min-height: 100vh;
+  color: black;                /* Set default text color to black */
+}
+
+.projectName {
+  font-size: 3vw;
+  text-align: center;
+  color: black;                /* Black text for project name */
+}
+
+.block {
+  padding: 2%;
+  border-radius: 5vh;
+  color: black;                /* Set block text color to black */
+  background-color: rgba(105, 105, 117, 0.322);  /* Soft blue background */
+  width: 40%;
+  height: 60%;
+  margin-top: 2%;
+  margin-left: 28%;
+}
+
+.blockTitle {
+  width: 100%;
+  text-align: center;
+  font-size: 2.5vw;
+  padding-bottom: 1.5%;
+  color: black;                /* Black text for block title */
+}
+
+.inputLabel {
+  width: 20%;
+  text-align: center;
+  font-size: 1.5vw;
+  vertical-align: text-top;
+  color: black;                /* Black text for input label */
+}
+
+.inputValue {
+  color: black;                /* Keep black text for input values */
+  width: 80%;
+  float: right;
+  font-size: 1.5vw;
+}
+
+#errorMessage {
+  width: 100%;
+  text-align: center;
+  font-size: 1.5vw;
+  color: black;                /* Black text for error messages */
+}
+
+.button {
+  text-align: center;
+  border-radius: 3vh;
+  background-color: #ffffff;  /* White background for button */
+  width: 15%;
+  margin-left: 43%;
+  font-size: 1.5vw;
+  color: black;                /* Black text color for button */
+}
+
+.button:hover {
+  background-color: #d61313;  /* Red on hover */
+}
+
+.returnButton {
+  color: rgb(3, 3, 3);                /* Keep white for return button */
+  float: left;
+  margin: 1%;
+  width: 8%;
+  position: absolute;
+}
+
+
+
+
+
+
+
+
