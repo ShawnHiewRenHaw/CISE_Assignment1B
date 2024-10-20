@@ -1,13 +1,17 @@
 export interface Article {
-  _id?: string; 
+  id: string;
   title: string;
   authors: string[];
-  source: string;
-  pubyear: number;  
-  doi: string;
-  claim?: string;
-  evidence?: string;
+  source: string | null;
+  pubyear: number | null;
+  doi: string | null;
+  claim: string | null;
+  evidence: string | null;
+  research: string | null;
+  participant: string | null;
   status: string;
-  research: string;
-  participant: string;
+  rating: {
+    average: number;
+    count: number;
+  };  
 }

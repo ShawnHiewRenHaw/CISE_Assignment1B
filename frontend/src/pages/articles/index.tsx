@@ -14,22 +14,12 @@ interface ArticlesInterface {
   evidence: string | null;
   research: string | null;
   participant: string | null;
+  rating: { average: number; count: number };
 }
 
 type ArticlesProps = {
   articles: ArticlesInterface[];
 };
-
-const claimsOptions = [
-  { value: "code quality improvement", label: "Code Quality Improvement" },
-  { value: "product quality improvement", label: "Product Quality Improvement" },
-];
-
-const sePracticesOptions = [
-  { value: "practice1", label: "SE Practice 1" },
-  { value: "practice2", label: "SE Practice 2" },
-  { value: "practice3", label: "SE Practice 3" },
-];
 
 const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   const [searchQuery, setSearchQuery] = useState<string>(""); 
@@ -52,19 +42,46 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
     { key: "participant", label: "Participant" },
   ];
 
+  // Initialize column visibility
   useEffect(() => {
     if (columnVisibility.length === 0) {
       setColumnVisibility(Array(headers.length).fill(true));
     }
   }, [columnVisibility.length]);
 
-  const handleRatingChange = (articleId: string, rating: string) => {
+  // Handle rating change
+  const handleRatingChange = async (articleId: string, newRating: number) => {
+    const article = articles.find(a => a.id === articleId);
+
+    if (!article) return;
+
+    // Update the state with the new rating locally
     setRatings((prevRatings) => ({
       ...prevRatings,
-      [articleId]: rating,
+      [articleId]: newRating,
     }));
+
+    // Send the new rating to the backend
+    try {
+      const res = await fetch(`http://localhost:3001/articles/${articleId}/rate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rating: newRating,
+        }),
+      });
+
+      if (!res.ok) {
+        console.error('Error updating rating');
+      }
+    } catch (err) {
+      console.error('Error submitting rating:', err);
+    }
   };
 
+  // Filter articles based on search query, claim, and practice
   const filteredArticles = articles.filter((article) => {
     const matchesSearchQuery = Object.keys(article).some((key) => {
       const value = article[key as keyof ArticlesInterface];
@@ -93,7 +110,6 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
     <main id="main">
       <h1 className="projectName">Articles Index Page</h1>
 
-      {/* Flex container to align the search bar, SE Practice, Select Claim, and Hide Columns in the same line */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '2em', marginBottom: '1em', flexWrap: 'wrap' }}>
         {/* Search input */}
         <input
@@ -102,7 +118,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className={formStyles.formItem}
-          style={{ width: "100%", maxWidth: "20em" }} 
+          style={{ width: "100%", maxWidth: "20em" }}
         />
 
         {/* Select Claim Dropdown */}
@@ -115,9 +131,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
             className={formStyles.formItem}
           >
             <option value="">All Claims</option>
-            {claimsOptions.map((option) => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
+            {/* Your claim options here */}
           </select>
         </div>
 
@@ -131,31 +145,29 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
             className={formStyles.formItem}
           >
             <option value="">All Practices</option>
-            {sePracticesOptions.map((option) => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
+            {/* Your SE practices options here */}
           </select>
         </div>
 
         {/* Hide Columns Dropdown */}
         <div style={{ position: 'relative' }}>
-          <button 
-            onClick={toggleDropdown} 
-            className={formStyles.formItem} 
+          <button
+            onClick={toggleDropdown}
+            className={formStyles.formItem}
             style={{ cursor: 'pointer', padding: '0.5em 1em' }}
           >
             {dropdownOpen ? 'Hide Columns ▼' : 'Hide Columns ▶'}
           </button>
 
           {dropdownOpen && (
-            <div 
+            <div
               style={{
-                position: 'absolute', 
-                top: '3em', 
-                left: 0, 
-                backgroundColor: '#fff', 
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', 
-                padding: '1em', 
+                position: 'absolute',
+                top: '3em',
+                left: 0,
+                backgroundColor: '#fff',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                padding: '1em',
                 zIndex: 1000
               }}
             >
@@ -176,23 +188,30 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
 
       {/* Sortable table with filtered articles and rating column */}
       <SortableTable
-        headers={headers.filter((_, index) => columnVisibility[index])} 
+        headers={headers.filter((_, index) => columnVisibility[index])}
         data={filteredArticles.map((article) => ({
           ...article,
           rating: (
-            <select
-              onChange={(e) => handleRatingChange(article.id, e.target.value)}
-              value={ratings[article.id] || ""}
-              className={formStyles.formItem}
-              style={{ padding: '5px' }}
-            >
-              <option value="">Rate</option>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <option key={star} value={star}>{star} ⭐</option>
-              ))}
-            </select>
+            <div>
+              <div style={{ marginBottom: '0.5em' }}>
+                <strong>Average Rating:</strong> <span style={{ color: 'gold' }}>{article.rating.average.toFixed(2)} ⭐</span> ({article.rating.count} ratings)
+              </div>
+              <div>
+                <select
+                  onChange={(e) => handleRatingChange(article.id, Number(e.target.value))}
+                  value={ratings[article.id] || ""}
+                  className={formStyles.formItem}
+                  style={{ padding: '5px', width: '100%' }}
+                >
+                  <option value="">Rate</option>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <option key={star} value={star}>{star} ⭐</option>
+                  ))}
+                </select>
+              </div>
+            </div>
           )
-        }))} 
+        }))}
       />
     </main>
   );
@@ -209,9 +228,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
     props: {
       articles: Array.isArray(approvedArticles)
         ? approvedArticles.map((article: any) => ({
-            id: article._id || null, 
+            id: article._id || null,
             title: article.title || null,
-            authors: article.authors || [], 
+            authors: article.authors || [],
             source: article.source || null,
             pubyear: article.pubyear || null,
             doi: article.doi || null,
@@ -219,6 +238,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
             evidence: article.evidence || null,
             research: article.research || null,
             participant: article.participant || null,
+            rating: article.rating || { average: 0, count: 0 }, 
           }))
         : [],
     },
