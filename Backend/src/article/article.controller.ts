@@ -30,8 +30,15 @@ export class ArticleController {
     @Body('research') research: string, 
     @Body('participant') participant: string 
   ): Promise<Article> {
-    return this.articleService.updateStatus(id, status, evidence, research, participant); 
+    return this.articleService.updateStatus(id, status, evidence, research, participant);
   }
 
-  
+  // New route to handle rating updates
+  @Post(':id/rate')
+  async rateArticle(
+    @Param('id') id: string,
+    @Body('rating') rating: number
+  ): Promise<Article | null> {
+    return this.articleService.updateRating(id, rating);
+  }
 }
