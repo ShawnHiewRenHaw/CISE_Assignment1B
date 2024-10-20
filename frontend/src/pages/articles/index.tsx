@@ -33,12 +33,21 @@ const sePracticesOptions = [
 ];
 
 const Articles: NextPage<ArticlesProps> = ({ articles }) => {
+<<<<<<< Updated upstream
   const [searchQuery, setSearchQuery] = useState<string>(""); // Search input
   const [filterColumn, setFilterColumn] = useState<string>(""); // Selected column to filter by
   const [selectedClaim, setSelectedClaim] = useState<string | null>(null); // Selected claim
   const [selectedPractice, setSelectedPractice] = useState<string | null>(null); // Selected SE practice
   const [ratings, setRatings] = useState<Record<string, number | string>>({}); // Track ratings by article ID
   const [columnVisibility, setColumnVisibility] = useState<boolean[]>([]); // Track visibility of each column
+=======
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedClaim, setSelectedClaim] = useState<string | null>(null);
+  const [selectedPractice, setSelectedPractice] = useState<string | null>(null);
+  const [ratings, setRatings] = useState<Record<string, number | string>>({});
+  const [columnVisibility, setColumnVisibility] = useState<boolean[]>([]);
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+>>>>>>> Stashed changes
 
   const headers: { key: keyof ArticlesInterface | 'rating'; label: string }[] = [
     { key: "title", label: "Title" },
@@ -152,6 +161,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
         data={filteredArticles.map((article) => ({
           ...article,
           rating: (
+<<<<<<< Updated upstream
             <select
               onChange={(e) => handleRatingChange(article.id, e.target.value)}
               value={ratings[article.id] || ""}
@@ -164,6 +174,32 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
               ))}
             </select>
           )
+=======
+            <div>
+              <div style={{ marginBottom: '0.5em' }}>
+                <strong>Average Rating:</strong>
+                <span style={{ color: 'gold' }}>
+                  {/* Safely access article.rating and use fallback values */}
+                  {article?.rating?.average?.toFixed(2) ?? 'N/A'} ⭐
+                </span>
+                ({article?.rating?.count ?? 0} ratings)
+              </div>
+              <div>
+                <select
+                  onChange={(e) => handleRatingChange(article.id, Number(e.target.value))}
+                  value={ratings[article.id] || ""}
+                  className={formStyles?.formItem || ""}
+                  style={{ padding: '5px', width: '100%' }}
+                >
+                  <option value="">Rate</option>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <option key={star} value={star}>{star} ⭐</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          ),
+>>>>>>> Stashed changes
         }))}
       />
     </main>
@@ -182,6 +218,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     props: {
       articles: Array.isArray(approvedArticles)
         ? approvedArticles.map((article: any) => ({
+<<<<<<< Updated upstream
             id: article._id || null,  // Ensure each article has an id
             title: article.title || null,
             authors: article.authors || [], // Ensure authors is an array, default to empty
@@ -194,6 +231,21 @@ export const getServerSideProps: GetServerSideProps = async () => {
             participant: article.participant || null, // Handle evidence
           }))
         : [], // If articles is not an array, fallback to an empty array
+=======
+          id: article._id || null,
+          title: article.title || null,
+          authors: article.authors || [],
+          source: article.source || null,
+          pubyear: article.pubyear || null,
+          doi: article.doi || null,
+          claim: article.claim || null,
+          evidence: article.evidence || null,
+          research: article.research || null,
+          participant: article.participant || null,
+          rating: article.rating || { average: 0, count: 0 },
+        }))
+        : [],
+>>>>>>> Stashed changes
     },
   };
 };
