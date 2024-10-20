@@ -4,6 +4,7 @@ import SortableTable from "../../components/table/SortableTable";
 import formStyles from "../../styles/Form.module.scss";
 
 interface ArticlesInterface {
+  rating: any;
   id: string;
   title: string;
   authors: string[];
@@ -33,21 +34,12 @@ const sePracticesOptions = [
 ];
 
 const Articles: NextPage<ArticlesProps> = ({ articles }) => {
-<<<<<<< Updated upstream
-  const [searchQuery, setSearchQuery] = useState<string>(""); // Search input
-  const [filterColumn, setFilterColumn] = useState<string>(""); // Selected column to filter by
-  const [selectedClaim, setSelectedClaim] = useState<string | null>(null); // Selected claim
-  const [selectedPractice, setSelectedPractice] = useState<string | null>(null); // Selected SE practice
-  const [ratings, setRatings] = useState<Record<string, number | string>>({}); // Track ratings by article ID
-  const [columnVisibility, setColumnVisibility] = useState<boolean[]>([]); // Track visibility of each column
-=======
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedClaim, setSelectedClaim] = useState<string | null>(null);
   const [selectedPractice, setSelectedPractice] = useState<string | null>(null);
   const [ratings, setRatings] = useState<Record<string, number | string>>({});
   const [columnVisibility, setColumnVisibility] = useState<boolean[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
->>>>>>> Stashed changes
 
   const headers: { key: keyof ArticlesInterface | 'rating'; label: string }[] = [
     { key: "title", label: "Title" },
@@ -109,7 +101,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         className={formStyles.formItem}
-        style={{ marginBottom: "1em", width: "100%", maxWidth: "30em" }} 
+        style={{ marginBottom: "1em", width: "100%", maxWidth: "30em" }}
       />
 
       {/* Claim Dropdown */}
@@ -157,24 +149,10 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
 
       {/* Sortable table with filtered articles and rating column */}
       <SortableTable
-        headers={headers.filter((_, index) => columnVisibility[index])} 
+        headers={headers.filter((_, index) => columnVisibility[index])}
         data={filteredArticles.map((article) => ({
           ...article,
           rating: (
-<<<<<<< Updated upstream
-            <select
-              onChange={(e) => handleRatingChange(article.id, e.target.value)}
-              value={ratings[article.id] || ""}
-              className={formStyles.formItem}
-              style={{ padding: '5px' }}
-            >
-              <option value="">Rate</option>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <option key={star} value={star}>{star} ⭐</option>
-              ))}
-            </select>
-          )
-=======
             <div>
               <div style={{ marginBottom: '0.5em' }}>
                 <strong>Average Rating:</strong>
@@ -186,20 +164,19 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
               </div>
               <div>
                 <select
-                  onChange={(e) => handleRatingChange(article.id, Number(e.target.value))}
+                  onChange={(e) => handleRatingChange(article.id, e.target.value)} // Pass value as a string
                   value={ratings[article.id] || ""}
                   className={formStyles?.formItem || ""}
                   style={{ padding: '5px', width: '100%' }}
                 >
                   <option value="">Rate</option>
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <option key={star} value={star}>{star} ⭐</option>
+                    <option key={star} value={star.toString()}>{star} ⭐</option> // Ensure value is string
                   ))}
                 </select>
               </div>
             </div>
           ),
->>>>>>> Stashed changes
         }))}
       />
     </main>
@@ -218,20 +195,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
     props: {
       articles: Array.isArray(approvedArticles)
         ? approvedArticles.map((article: any) => ({
-<<<<<<< Updated upstream
-            id: article._id || null,  // Ensure each article has an id
-            title: article.title || null,
-            authors: article.authors || [], // Ensure authors is an array, default to empty
-            source: article.source || null, // Handle source
-            pubyear: article.pubyear || null, // Handle pubyear
-            doi: article.doi || null, // Handle doi
-            claim: article.claim || null, // Handle claim
-            evidence: article.evidence || null, // Handle evidence
-            research: article.research || null, // Handle evidence
-            participant: article.participant || null, // Handle evidence
-          }))
-        : [], // If articles is not an array, fallback to an empty array
-=======
           id: article._id || null,
           title: article.title || null,
           authors: article.authors || [],
@@ -245,7 +208,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
           rating: article.rating || { average: 0, count: 0 },
         }))
         : [],
->>>>>>> Stashed changes
     },
   };
 };
