@@ -33,6 +33,12 @@ export class ArticleController {
     return this.articleService.updateStatus(id, status, evidence, research, participant);
   }
 
+  // Route for getting an article by ID
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<Article | null> {
+    return this.articleService.findOneById(id);
+  }
+
   // New route to handle rating updates
   @Post(':id/rate')
   async rateArticle(
