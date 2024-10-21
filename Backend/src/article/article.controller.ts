@@ -17,11 +17,6 @@ export class ArticleController {
     return this.articleService.findApproved();
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Article | null> {
-    return this.articleService.findOneById(id);
-  }
-
   @Post()
   async create(@Body() createArticleDto: CreateArticleDto): Promise<Article> {
     return this.articleService.create(createArticleDto);
@@ -33,12 +28,18 @@ export class ArticleController {
     @Body('status') status: string,
     @Body('evidence') evidence: string, 
     @Body('research') research: string, 
-    @Body('participant') participant: string
+    @Body('participant') participant: string 
   ): Promise<Article> {
     return this.articleService.updateStatus(id, status, evidence, research, participant);
   }
 
-  // Route to handle rating updates
+  // Route for getting an article by ID
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<Article | null> {
+    return this.articleService.findOneById(id);
+  }
+
+  // New route to handle rating updates
   @Post(':id/rate')
   async rateArticle(
     @Param('id') id: string,
