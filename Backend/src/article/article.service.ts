@@ -69,4 +69,8 @@ export class ArticleService {
 
     return null;
   }
+
+  async findOneById(id: string): Promise<Article | null> {
+    return this.articleModel.findById(id).exec();
+  }  
 }
