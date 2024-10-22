@@ -20,7 +20,7 @@ const nextConfig = {
         destination: '/moderator/moderator',  // Actual file path
       },
       {
-        source: '/articles/index',  // Clean URL for articles index
+        source: '/articles',  // Clean URL for articles index
         destination: '/articles/index',  // Actual file path
       },
       {
