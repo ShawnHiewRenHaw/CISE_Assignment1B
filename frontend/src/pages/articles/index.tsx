@@ -50,20 +50,20 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   }, [columnVisibility.length]);
 
   // Handle rating change
-  const handleRatingChange = async (articleId: string, newRating: number) => {
-    const article = articles.find(a => a.id === articleId);
+  const handleRatingChange = async (id: string, newRating: number) => {
+    const article = articles.find(a => a.id === id);
 
     if (!article) return;
 
     // Update the state with the new rating locally
     setRatings((prevRatings) => ({
       ...prevRatings,
-      [articleId]: newRating,
+      [id]: newRating,
     }));
 
     // Send the new rating to the backend
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles/${articleId}/rate`, {
+      const res = await fetch(`http://localhost:3001/articles/${id}/rate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -219,15 +219,9 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
 
 // Fetch data from the NestJS backend
 export const getServerSideProps: GetServerSideProps = async () => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  const res = await fetch(`${apiUrl}/articles`);
-
-  if (!res.ok) {
-    console.error('Error fetching articles:', res.statusText);
-    return { props: { articles: [] } }; // Return an empty array on error
-  }
-
+  const res = await fetch('http://localhost:3001/articles');
   const articles = await res.json();
+
   const approvedArticles = articles.filter((article: any) => article.status === "approved");
 
   return {
