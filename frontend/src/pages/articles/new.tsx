@@ -9,7 +9,6 @@ const NewDiscussion = () => {
   const [pubYear, setPubYear] = useState<number | null>(null);
   const [doi, setDoi] = useState<string>("");
   const [summary, setSummary] = useState<string>("");
-  const [linkedDiscussion, setLinkedDiscussion] = useState<string>("");
   const [email, setEmail] = useState<string>(""); // New state for email
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
@@ -50,14 +49,13 @@ const NewDiscussion = () => {
         setPubYear(null);
         setDoi("");
         setSummary("");
-        setLinkedDiscussion("");
         setEmail(""); // Reset email
         setError(null);
       } else {
         const errorData = await res.json();
         setError(errorData.message || "Failed to submit article");
       }
-    } catch (err) {
+    } catch {
       setError("Failed to submit article. Please try again.");
     }
   };

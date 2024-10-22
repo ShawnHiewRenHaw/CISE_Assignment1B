@@ -50,20 +50,20 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   }, [columnVisibility.length]);
 
   // Handle rating change
-  const handleRatingChange = async (articleId: string, newRating: number) => {
-    const article = articles.find(a => a.id === articleId);
+  const handleRatingChange = async (id: string, newRating: number) => {
+    const article = articles.find(a => a.id === id);
 
     if (!article) return;
 
     // Update the state with the new rating locally
     setRatings((prevRatings) => ({
       ...prevRatings,
-      [articleId]: newRating,
+      [id]: newRating,
     }));
 
     // Send the new rating to the backend
     try {
-      const res = await fetch(`http://localhost:3001/articles/${articleId}/rate`, {
+      const res = await fetch(`http://localhost:3001/articles/${id}/rate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

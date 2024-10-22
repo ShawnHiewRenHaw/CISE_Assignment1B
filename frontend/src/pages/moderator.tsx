@@ -2,7 +2,6 @@
 import { NextPage } from "next";
 import { useState, useEffect } from "react";
 import SortableTable from "../components/table/SortableTable";
-import formStyles from "../styles/Form.module.scss"; // Import the styles
 
 interface ArticleInterface {
   id: string;

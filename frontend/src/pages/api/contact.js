@@ -1,4 +1,4 @@
-import { mailOptions, transporter } from "../../config/nodemailer";
+/* import { mailOptions, transporter } from "../../config/nodemailer";
 
 const CONTACT_MESSAGE_FIELDS = {
   name: "Name",
@@ -45,4 +45,4 @@ const handler = async (req, res) => {
   }
   return res.status(400).json({ message: "Bad request" });
 };
-export default handler;
+export default handler; */
