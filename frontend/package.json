@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@types/nodemailer": "^6.4.16",
+    "fetch": "^1.1.0",
+    "isomorphic-unfetch": "^4.0.2",
     "next": "^14.2.15",
     "next-auth": "^4.24.7",
     "next.js": "^1.0.3",
