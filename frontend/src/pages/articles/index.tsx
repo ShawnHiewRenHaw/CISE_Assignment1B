@@ -237,4 +237,33 @@ const Articles = () => {
   );
 };
 
+// Fetch data from the NestJS backend
+export const getServerSideProps: GetServerSideProps = async () => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const res = await fetch(`${apiUrl}/articles`);
+  const articles = await res.json();
+
+  const approvedArticles = articles.filter((article: any) => article.status === "approved");
+
+  return {
+    props: {
+      articles: Array.isArray(approvedArticles)
+        ? approvedArticles.map((article: any) => ({
+            id: article._id || null,
+            title: article.title || null,
+            authors: article.authors || [],
+            source: article.source || null,
+            pubyear: article.pubyear || null,
+            doi: article.doi || null,
+            claim: article.claim || null,
+            evidence: article.evidence || null,
+            research: article.research || null,
+            participant: article.participant || null,
+            rating: article.rating || { average: 0, count: 0 }, 
+          }))
+        : [],
+    },
+  };
+};
+
 export default Articles;
