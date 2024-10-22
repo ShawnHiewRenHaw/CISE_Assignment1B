@@ -18,10 +18,10 @@ interface ArticlesInterface {
 
 const Articles = () => {
   const [articles, setArticles] = useState<ArticlesInterface[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>(""); 
-  const [selectedClaim, setSelectedClaim] = useState<string | null>(null); 
-  const [selectedPractice, setSelectedPractice] = useState<string | null>(null); 
-  const [ratings, setRatings] = useState<Record<string, number | string>>({}); 
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedClaim, setSelectedClaim] = useState<string | null>(null);
+  const [selectedPractice, setSelectedPractice] = useState<string | null>(null);
+  const [ratings, setRatings] = useState<Record<string, number | string>>({});
   const [columnVisibility, setColumnVisibility] = useState<boolean[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +30,11 @@ const Articles = () => {
     const fetchArticles = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles`);
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch: ${res.statusText}`);
+        }
+
         const data = await res.json();
         const approvedArticles = data.filter((article: any) => article.status === "approved");
         setArticles(approvedArticles);
