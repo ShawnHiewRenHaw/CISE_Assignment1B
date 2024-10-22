@@ -21,7 +21,7 @@ const nextConfig = {
       },
       {
         source: '/articles',  // Clean URL for articles index
-        destination: '/articles/index',  // Actual file path
+        destination: '/articles',  // Actual file path
       },
       {
         source: '/articles/new',  // Clean URL for new article page
