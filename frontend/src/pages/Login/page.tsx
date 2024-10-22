@@ -38,8 +38,8 @@ export default function Home() {
 
       <div id="tempHiddenLinks" hidden>
         {/* Use Link for navigation */}
-        <Link href='././Admin' id="admin"></Link>
-        <Link href='././Analyst' id="analyst"></Link>
+        <Link href='../Admin' id="admin"></Link>
+        <Link href='../Analyst' id="analyst"></Link>
         <Link href='../moderator' id="moderator"></Link>
       </div>
     </main>

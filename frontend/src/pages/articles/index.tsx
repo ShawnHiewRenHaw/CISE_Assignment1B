@@ -219,7 +219,8 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
 
 // Fetch data from the NestJS backend
 export const getServerSideProps: GetServerSideProps = async () => {
-  const res = await fetch('http://localhost:3001/articles');
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const res = await fetch(`${apiUrl}/articles`);
   const articles = await res.json();
 
   const approvedArticles = articles.filter((article: any) => article.status === "approved");
