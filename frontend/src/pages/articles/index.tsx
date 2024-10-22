@@ -47,7 +47,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
     if (columnVisibility.length === 0) {
       setColumnVisibility(Array(headers.length).fill(true));
     }
-  }, [columnVisibility.length]);
+  }, [columnVisibility.length, headers.length]); // Updated dependency array
 
   // Handle rating change
   const handleRatingChange = async (id: string, newRating: number) => {
@@ -63,7 +63,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
 
     // Send the new rating to the backend
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles/${id}/rate`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles/${id}/rate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,8 +73,8 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
         }),
       });
 
-      if (!res.ok) {
-        console.error('Error updating rating');
+      if (!response.ok) {
+        console.error('Error updating rating:', response.statusText);
       }
     } catch (err) {
       console.error('Error submitting rating:', err);
