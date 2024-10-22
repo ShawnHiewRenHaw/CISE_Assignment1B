@@ -4,13 +4,7 @@
     "next/typescript"
   ],
   "rules": {
-    "@typescript-eslint/no-explicit-any": [
-      "off"
-    ]
-  },
-  "eslintConfig": {
-    "rules": {
-      "no-var": 0
-    }
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-var": "off"
   }
 }
