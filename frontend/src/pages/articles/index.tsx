@@ -1,4 +1,3 @@
-import { GetServerSideProps, NextPage } from "next";
 import { useState, useEffect } from "react";
 import SortableTable from "../../components/table/SortableTable";
 import formStyles from "../../styles/Form.module.scss";
@@ -17,17 +16,31 @@ interface ArticlesInterface {
   rating: { average: number; count: number };
 }
 
-type ArticlesProps = {
-  articles: ArticlesInterface[];
-};
-
-const Articles: NextPage<ArticlesProps> = ({ articles }) => {
+const Articles = () => {
+  const [articles, setArticles] = useState<ArticlesInterface[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>(""); 
   const [selectedClaim, setSelectedClaim] = useState<string | null>(null); 
   const [selectedPractice, setSelectedPractice] = useState<string | null>(null); 
   const [ratings, setRatings] = useState<Record<string, number | string>>({}); 
   const [columnVisibility, setColumnVisibility] = useState<boolean[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles`);
+        const data = await res.json();
+        const approvedArticles = data.filter((article: any) => article.status === "approved");
+        setArticles(approvedArticles);
+      } catch (err) {
+        setError("Failed to load articles. Please try again later.");
+        console.error(err);
+      }
+    };
+
+    fetchArticles();
+  }, []);
 
   const headers: { key: keyof ArticlesInterface | 'rating'; label: string }[] = [
     { key: "title", label: "Title" },
@@ -63,7 +76,7 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
 
     // Send the new rating to the backend
     try {
-      const res = await fetch(`http://localhost:3001/articles/${id}/rate`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles/${id}/rate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,6 +122,8 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   return (
     <main id="main">
       <h1 className="projectName">Articles Index Page</h1>
+
+      {error && <p style={{ color: 'red' }}>{error}</p>}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '2em', marginBottom: '1em', flexWrap: 'wrap' }}>
         {/* Search input */}
@@ -215,34 +230,6 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
       />
     </main>
   );
-};
-
-// Fetch data from the NestJS backend
-export const getServerSideProps: GetServerSideProps = async () => {
-  const res = await fetch('http://localhost:3001/articles');
-  const articles = await res.json();
-
-  const approvedArticles = articles.filter((article: any) => article.status === "approved");
-
-  return {
-    props: {
-      articles: Array.isArray(approvedArticles)
-        ? approvedArticles.map((article: any) => ({
-            id: article._id || null,
-            title: article.title || null,
-            authors: article.authors || [],
-            source: article.source || null,
-            pubyear: article.pubyear || null,
-            doi: article.doi || null,
-            claim: article.claim || null,
-            evidence: article.evidence || null,
-            research: article.research || null,
-            participant: article.participant || null,
-            rating: article.rating || { average: 0, count: 0 }, 
-          }))
-        : [],
-    },
-  };
 };
 
 export default Articles;
