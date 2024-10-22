@@ -1,4 +1,3 @@
-import { GetServerSideProps } from "next"; // Import GetServerSideProps
 import { useState, useEffect } from "react";
 import SortableTable from "../../components/table/SortableTable";
 import formStyles from "../../styles/Form.module.scss";
@@ -17,13 +16,25 @@ interface ArticlesInterface {
   rating: { average: number; count: number };
 }
 
-const Articles = ({ articles }: { articles: ArticlesInterface[] }) => {
+const Articles = () => {
+  const [articles, setArticles] = useState<ArticlesInterface[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedClaim, setSelectedClaim] = useState<string | null>(null);
   const [selectedPractice, setSelectedPractice] = useState<string | null>(null);
   const [ratings, setRatings] = useState<Record<string, number | string>>({});
   const [columnVisibility, setColumnVisibility] = useState<boolean[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles`);
+      const data = await res.json();
+      const approvedArticles = data.filter((article: any) => article.status === "approved");
+      setArticles(approvedArticles);
+    };
+
+    fetchArticles();
+  }, []);
 
   const headers: { key: keyof ArticlesInterface | "rating"; label: string }[] = [
     { key: "title", label: "Title" },
@@ -58,23 +69,15 @@ const Articles = ({ articles }: { articles: ArticlesInterface[] }) => {
     }));
 
     // Send the new rating to the backend
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles/${id}/rate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          rating: newRating,
-        }),
-      });
-
-      if (!res.ok) {
-        console.error("Error updating rating");
-      }
-    } catch (err) {
-      console.error("Error submitting rating:", err);
-    }
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles/${id}/rate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        rating: newRating,
+      }),
+    });
   };
 
   // Filter articles based on search query, claim, and practice
@@ -85,9 +88,7 @@ const Articles = ({ articles }: { articles: ArticlesInterface[] }) => {
     });
 
     const matchesClaim = selectedClaim ? article.claim === selectedClaim : true;
-    const matchesPractice = selectedPractice
-      ? article.evidence?.toLowerCase().includes(selectedPractice.toLowerCase())
-      : true;
+    const matchesPractice = selectedPractice ? article.evidence?.toLowerCase().includes(selectedPractice.toLowerCase()) : true;
 
     return matchesSearchQuery && matchesClaim && matchesPractice;
   });
@@ -108,17 +109,7 @@ const Articles = ({ articles }: { articles: ArticlesInterface[] }) => {
     <main id="main">
       <h1 className="projectName">Articles Index Page</h1>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "2em",
-          marginBottom: "1em",
-          flexWrap: "wrap",
-        }}
-      >
+      <div style={{ display: "flex", alignItems: "center", gap: "2em", marginBottom: "1em", flexWrap: "wrap" }}>
         {/* Search input */}
         <input
           type="text"
@@ -207,10 +198,8 @@ const Articles = ({ articles }: { articles: ArticlesInterface[] }) => {
             <div>
               <div style={{ marginBottom: "0.5em" }}>
                 <strong>Average Rating:</strong>{" "}
-                <span style={{ color: "gold" }}>
-                  {article.rating.average.toFixed(2)} ⭐
-                </span>{" "}
-                ({article.rating.count} ratings)
+                <span style={{ color: "gold" }}>{article.rating.average.toFixed(2)} ⭐</span> (
+                {article.rating.count} ratings)
               </div>
               <div>
                 <select
@@ -233,35 +222,6 @@ const Articles = ({ articles }: { articles: ArticlesInterface[] }) => {
       />
     </main>
   );
-};
-
-// Fetch data from the backend
-export const getServerSideProps: GetServerSideProps = async () => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-  const res = await fetch(`${apiUrl}/articles`);
-  const articles = await res.json();
-
-  const approvedArticles = articles.filter((article: any) => article.status === "approved");
-
-  return {
-    props: {
-      articles: Array.isArray(approvedArticles)
-        ? approvedArticles.map((article: any) => ({
-            id: article._id || null,
-            title: article.title || null,
-            authors: article.authors || [],
-            source: article.source || null,
-            pubyear: article.pubyear || null,
-            doi: article.doi || null,
-            claim: article.claim || null,
-            evidence: article.evidence || null,
-            research: article.research || null,
-            participant: article.participant || null,
-            rating: article.rating || { average: 0, count: 0 },
-          }))
-        : [],
-    },
-  };
 };
 
 export default Articles;
