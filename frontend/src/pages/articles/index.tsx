@@ -1,3 +1,4 @@
+import { GetServerSideProps } from "next"; // Import GetServerSideProps
 import { useState, useEffect } from "react";
 import SortableTable from "../../components/table/SortableTable";
 import formStyles from "../../styles/Form.module.scss";
@@ -16,8 +17,7 @@ interface ArticlesInterface {
   rating: { average: number; count: number };
 }
 
-const Articles = () => {
-  const [articles, setArticles] = useState<ArticlesInterface[]>([]);
+const Articles = ({ articles }: { articles: ArticlesInterface[] }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedClaim, setSelectedClaim] = useState<string | null>(null);
   const [selectedPractice, setSelectedPractice] = useState<string | null>(null);
@@ -26,28 +26,7 @@ const Articles = () => {
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles`);
-
-        if (!res.ok) {
-          throw new Error(`Failed to fetch: ${res.statusText}`);
-        }
-
-        const data = await res.json();
-        const approvedArticles = data.filter((article: any) => article.status === "approved");
-        setArticles(approvedArticles);
-      } catch (err) {
-        setError("Failed to load articles. Please try again later.");
-        console.error(err);
-      }
-    };
-
-    fetchArticles();
-  }, []);
-
-  const headers: { key: keyof ArticlesInterface | 'rating'; label: string }[] = [
+  const headers: { key: keyof ArticlesInterface | "rating"; label: string }[] = [
     { key: "title", label: "Title" },
     { key: "authors", label: "Authors" },
     { key: "rating", label: "Rating" },
@@ -69,7 +48,7 @@ const Articles = () => {
 
   // Handle rating change
   const handleRatingChange = async (id: string, newRating: number) => {
-    const article = articles.find(a => a.id === id);
+    const article = articles.find((a) => a.id === id);
 
     if (!article) return;
 
@@ -82,9 +61,9 @@ const Articles = () => {
     // Send the new rating to the backend
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles/${id}/rate`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           rating: newRating,
@@ -92,10 +71,10 @@ const Articles = () => {
       });
 
       if (!res.ok) {
-        console.error('Error updating rating');
+        console.error("Error updating rating");
       }
     } catch (err) {
-      console.error('Error submitting rating:', err);
+      console.error("Error submitting rating:", err);
     }
   };
 
@@ -107,7 +86,9 @@ const Articles = () => {
     });
 
     const matchesClaim = selectedClaim ? article.claim === selectedClaim : true;
-    const matchesPractice = selectedPractice ? article.evidence?.toLowerCase().includes(selectedPractice.toLowerCase()) : true;
+    const matchesPractice = selectedPractice
+      ? article.evidence?.toLowerCase().includes(selectedPractice.toLowerCase())
+      : true;
 
     return matchesSearchQuery && matchesClaim && matchesPractice;
   });
@@ -128,9 +109,17 @@ const Articles = () => {
     <main id="main">
       <h1 className="projectName">Articles Index Page</h1>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '2em', marginBottom: '1em', flexWrap: 'wrap' }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "2em",
+          marginBottom: "1em",
+          flexWrap: "wrap",
+        }}
+      >
         {/* Search input */}
         <input
           type="text"
@@ -143,7 +132,9 @@ const Articles = () => {
 
         {/* Select Claim Dropdown */}
         <div>
-          <label htmlFor="claim" style={{ marginRight: '0.5em' }}>Select Claim:</label>
+          <label htmlFor="claim" style={{ marginRight: "0.5em" }}>
+            Select Claim:
+          </label>
           <select
             id="claim"
             value={selectedClaim || ""}
@@ -157,7 +148,9 @@ const Articles = () => {
 
         {/* SE Practices Dropdown */}
         <div>
-          <label htmlFor="sePractices" style={{ marginRight: '0.5em' }}>Select SE Practice:</label>
+          <label htmlFor="sePractices" style={{ marginRight: "0.5em" }}>
+            Select SE Practice:
+          </label>
           <select
             id="sePractices"
             value={selectedPractice || ""}
@@ -170,35 +163,35 @@ const Articles = () => {
         </div>
 
         {/* Hide Columns Dropdown */}
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: "relative" }}>
           <button
             onClick={toggleDropdown}
             className={formStyles.formItem}
-            style={{ cursor: 'pointer', padding: '0.5em 1em' }}
+            style={{ cursor: "pointer", padding: "0.5em 1em" }}
           >
-            {dropdownOpen ? 'Hide Columns ▼' : 'Hide Columns ▶'}
+            {dropdownOpen ? "Hide Columns ▼" : "Hide Columns ▶"}
           </button>
 
           {dropdownOpen && (
             <div
               style={{
-                position: 'absolute',
-                top: '3em',
+                position: "absolute",
+                top: "3em",
                 left: 0,
-                backgroundColor: '#fff',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                padding: '1em',
-                zIndex: 1000
+                backgroundColor: "#fff",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                padding: "1em",
+                zIndex: 1000,
               }}
             >
               {headers.map((header, index) => (
-                <div key={header.key} style={{ marginBottom: '0.5em' }}>
+                <div key={header.key} style={{ marginBottom: "0.5em" }}>
                   <input
                     type="checkbox"
                     checked={columnVisibility[index]}
                     onChange={() => toggleColumn(index)}
                   />
-                  <label style={{ marginLeft: '0.5em' }}>{header.label}</label>
+                  <label style={{ marginLeft: "0.5em" }}>{header.label}</label>
                 </div>
               ))}
             </div>
@@ -213,33 +206,39 @@ const Articles = () => {
           ...article,
           rating: (
             <div>
-              <div style={{ marginBottom: '0.5em' }}>
-                <strong>Average Rating:</strong> <span style={{ color: 'gold' }}>{article.rating.average.toFixed(2)} ⭐</span> ({article.rating.count} ratings)
+              <div style={{ marginBottom: "0.5em" }}>
+                <strong>Average Rating:</strong>{" "}
+                <span style={{ color: "gold" }}>
+                  {article.rating.average.toFixed(2)} ⭐
+                </span>{" "}
+                ({article.rating.count} ratings)
               </div>
               <div>
                 <select
                   onChange={(e) => handleRatingChange(article.id, Number(e.target.value))}
                   value={ratings[article.id] || ""}
                   className={formStyles.formItem}
-                  style={{ padding: '5px', width: '100%' }}
+                  style={{ padding: "5px", width: "100%" }}
                 >
                   <option value="">Rate</option>
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <option key={star} value={star}>{star} ⭐</option>
+                    <option key={star} value={star}>
+                      {star} ⭐
+                    </option>
                   ))}
                 </select>
               </div>
             </div>
-          )
+          ),
         }))}
       />
     </main>
   );
 };
 
-// Fetch data from the NestJS backend
+// Fetch data from the backend
 export const getServerSideProps: GetServerSideProps = async () => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
   const res = await fetch(`${apiUrl}/articles`);
   const articles = await res.json();
 
@@ -259,7 +258,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
             evidence: article.evidence || null,
             research: article.research || null,
             participant: article.participant || null,
-            rating: article.rating || { average: 0, count: 0 }, 
+            rating: article.rating || { average: 0, count: 0 },
           }))
         : [],
     },
