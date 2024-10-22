@@ -50,20 +50,20 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
   }, [columnVisibility.length]);
 
   // Handle rating change
-  const handleRatingChange = async (id: string, newRating: number) => {
-    const article = articles.find(a => a.id === id);
+  const handleRatingChange = async (articleId: string, newRating: number) => {
+    const article = articles.find(a => a.id === articleId);
 
     if (!article) return;
 
     // Update the state with the new rating locally
     setRatings((prevRatings) => ({
       ...prevRatings,
-      [id]: newRating,
+      [articleId]: newRating,
     }));
 
     // Send the new rating to the backend
     try {
-      const res = await fetch(`http://localhost:3001/articles/${id}/rate`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles/${articleId}/rate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -219,30 +219,40 @@ const Articles: NextPage<ArticlesProps> = ({ articles }) => {
 
 // Fetch data from the NestJS backend
 export const getServerSideProps: GetServerSideProps = async () => {
-  const res = await fetch('http://localhost:3001/articles');
-  const articles = await res.json();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  console.log("API URL: ", apiUrl);
 
-  const approvedArticles = articles.filter((article: any) => article.status === "approved");
+  try {
+    const res = await fetch(`${apiUrl}/articles`);
+    if (!res.ok) {
+      console.error('Error fetching articles:', res.statusText);
+      return { props: { articles: [] } };
+    }
 
-  return {
-    props: {
-      articles: Array.isArray(approvedArticles)
-        ? approvedArticles.map((article: any) => ({
-            id: article._id || null,
-            title: article.title || null,
-            authors: article.authors || [],
-            source: article.source || null,
-            pubyear: article.pubyear || null,
-            doi: article.doi || null,
-            claim: article.claim || null,
-            evidence: article.evidence || null,
-            research: article.research || null,
-            participant: article.participant || null,
-            rating: article.rating || { average: 0, count: 0 }, 
-          }))
-        : [],
-    },
-  };
+    const articles = await res.json();
+    const approvedArticles = articles.filter((article: any) => article.status === "approved");
+
+    return {
+      props: {
+        articles: approvedArticles.map((article: any) => ({
+          id: article._id || null,
+          title: article.title || null,
+          authors: article.authors || [],
+          source: article.source || null,
+          pubyear: article.pubyear || null,
+          doi: article.doi || null,
+          claim: article.claim || null,
+          evidence: article.evidence || null,
+          research: article.research || null,
+          participant: article.participant || null,
+          rating: article.rating || { average: 0, count: 0 }, 
+        })),
+      },
+    };
+  } catch (error) {
+    console.error('Error occurred while fetching articles:', error);
+    return { props: { articles: [] } };
+  }
 };
 
 export default Articles;
