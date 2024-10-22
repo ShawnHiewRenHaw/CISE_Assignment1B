@@ -1,10 +1,7 @@
 import { NextPage } from "next";
 import { useState, useEffect } from "react";
 import SortableTable from "../../components/table/SortableTable";
-<<<<<<< Updated upstream
-=======
 import React from "react";
->>>>>>> Stashed changes
 
 interface UserInterface {
   id: string;
