@@ -7,5 +7,10 @@
     "@typescript-eslint/no-explicit-any": [
       "off"
     ]
+  },
+  "eslintConfig": {
+    "rules": {
+      "no-var": 0
+    }
   }
 }

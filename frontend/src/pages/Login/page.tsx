@@ -1,9 +1,5 @@
 'use client'
 
-import Image from 'next/image';
-import formStyles from "../../styles/Form.module.scss";
-
-
 function checkCredentials() {
   var username = (document.getElementById("username") as HTMLInputElement).value;
   var password = (document.getElementById("password") as HTMLInputElement).value;
