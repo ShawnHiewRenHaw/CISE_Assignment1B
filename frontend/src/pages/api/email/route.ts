@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+/* import { NextApiRequest, NextApiResponse } from 'next';
 import nodemailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 
@@ -42,3 +42,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(405).json({ error: 'Method not allowed' });
   }
 }
+*/
