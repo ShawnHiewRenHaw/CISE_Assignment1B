@@ -24,7 +24,6 @@ const Articles = ({ articles }: { articles: ArticlesInterface[] }) => {
   const [ratings, setRatings] = useState<Record<string, number | string>>({});
   const [columnVisibility, setColumnVisibility] = useState<boolean[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
 
   const headers: { key: keyof ArticlesInterface | "rating"; label: string }[] = [
     { key: "title", label: "Title" },
