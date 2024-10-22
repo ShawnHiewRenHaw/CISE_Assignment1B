@@ -230,6 +230,10 @@ export const getServerSideProps: GetServerSideProps = async () => {
     }
 
     const articles = await res.json();
+
+    // Log the fetched articles
+    console.log("Fetched articles:", articles);
+
     const approvedArticles = articles.filter((article: any) => article.status === "approved");
 
     return {
