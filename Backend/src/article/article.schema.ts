@@ -12,6 +12,10 @@ export interface Article extends Document {
   status: string;
   research: string;
   participant: string;
+  rating: {
+    average: number;  
+    count: number;     
+  };
 }
 
 export const ArticleSchema = new Schema({
@@ -23,6 +27,12 @@ export const ArticleSchema = new Schema({
   claim: { type: String, required: true },
   evidence: { type: String, required: false },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], required: true },
-  research: { type: String, required: false },  // Optional field
-  participant: { type: String, required: false } // Optional field
+  research: { type: String, required: false },  
+  participant: { type: String, required: false }, 
+
+  // Add the rating field
+  rating: {
+    average: { type: Number, default: 0 },  
+    count: { type: Number, default: 0 },    
+  },
 });
