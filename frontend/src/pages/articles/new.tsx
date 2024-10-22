@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import formStyles from "../../styles/Form.module.scss";
 
+
 const NewDiscussion = () => {
   const [title, setTitle] = useState<string>("");
   const [authors, setAuthors] = useState<string[]>([]);
@@ -13,10 +14,12 @@ const NewDiscussion = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
 
+
+  
   const submitNewArticle = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-     
+
 
     const newArticle = {
       title,
