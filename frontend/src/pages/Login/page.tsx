@@ -1,15 +1,15 @@
-'use client'
+import Link from 'next/link';
 
 function checkCredentials() {
   var username = (document.getElementById("username") as HTMLInputElement).value;
   var password = (document.getElementById("password") as HTMLInputElement).value;
 
-  if (username != null && password != null) {
-    if (username == "Admin" && password == "123456") {
+  if (username && password) {
+    if (username === "Admin" && password === "123456") {
       document.getElementById("admin")?.click();
-    } else if (username == "Analyst" && password == "123456") {
+    } else if (username === "Analyst" && password === "123456") {
       document.getElementById("analyst")?.click();
-    } else if (username == "Moderator" && password == "123456") {
+    } else if (username === "Moderator" && password === "123456") {
       document.getElementById("moderator")?.click();
     } else {
       (document.getElementById("errorMessage") as HTMLInputElement).innerHTML = "Wrong Credentials<br /><br />";
@@ -20,7 +20,10 @@ function checkCredentials() {
 export default function Home() {
   return (
     <main id="main">
-      <a href="/"><input type="button" className="button returnButton" value="Back" /></a>
+      {/* Use Link for the Back button */}
+      <Link href="/">
+        <input type="button" className="button returnButton" value="Back" />
+      </Link>
       <h1 className="projectName">SPEED</h1><br />
       <br />
       <form className="block">
@@ -32,10 +35,18 @@ export default function Home() {
         <p id="errorMessage" />
         <input type='button' className="button" value="Login" onClick={checkCredentials}></input>
       </form>
+
       <div id="tempHiddenLinks" hidden>
-        <a id="admin" href='././Admin'>Admin</a>
-        <a id="analyst" href='././Analyst'>Analyst</a>
-        <a id="moderator" href='../moderator'>Moderator</a>
+        {/* Use Link for navigation */}
+        <Link href='././Admin'>
+          <a id="admin"></a>
+        </Link>
+        <Link href='././Analyst'>
+          <a id="analyst"></a>
+        </Link>
+        <Link href='../moderator'>
+          <a id="moderator"></a>
+        </Link>
       </div>
     </main>
   )
